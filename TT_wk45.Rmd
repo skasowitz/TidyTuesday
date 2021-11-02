@@ -1,0 +1,66 @@
+---
+title: "TT45"
+author: "Seth Kasowitz"
+date: "11/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#install.packages("spDataLarge", 
+#                 repos = "https://nowosad.github.io/drat/", type = "source")
+
+library(spData)
+library(spDataLarge)
+library(tidyverse)
+library(sf)
+library(raster)
+library(tmap)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+
+```
+
+```{r}
+# Add fill layer to nz shape
+tm_shape(nz) +
+  tm_fill()
+```
+
+
+```{r}
+# Add border layer to nz shape
+tm_shape(nz) +
+  tm_borders()
+```
+
+
+```{r}
+# Add fill and border layers to nz shape
+tm_shape(nz) +
+  tm_fill() +
+  tm_borders() 
+```
+
+
+```{r}
+map_nz = tm_shape(nz) + tm_polygons()
+map_nz1 = map_nz +
+  tm_shape(nz_elev) + tm_raster(alpha = 0.7)
+
+nz_water = st_union(nz) %>% st_buffer(22200) %>% 
+  st_cast(to = "LINESTRING")
+
+map_nz2 = map_nz1 +
+  tm_shape(nz_water) + tm_lines()
+
+map_nz3 = map_nz2 +
+  tm_shape(nz_height) + tm_dots()
+```
+
+
+```{r}
+tmap_arrange(map_nz1, map_nz2, map_nz3)
+```
